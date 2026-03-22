@@ -23,6 +23,7 @@ dependencies {
 	implementation(libs.spring.boot.starter.webmvc)
 	implementation(libs.kotlin.reflect)
 	implementation(libs.jackson.module.kotlin)
+	testImplementation(libs.opensearch.testcontainers)
 	testImplementation(libs.spring.boot.starter.webmvc.test)
 	testImplementation(libs.spring.boot.testcontainers)
 	testImplementation(libs.kotlin.test.junit5)
