@@ -12,20 +12,20 @@ paths:
             schema:
               type: object
               properties:
-                first_name:
+                firstName:
                   type: string
-                last_name:
+                lastName:
                   type: string
                 email:
                   type: string
                   format: email
                 description:
                   type: string
-                social_links:
+                socialLinks:
                   type: array
                   items:
                     type: string
-              required: [first_name, last_name, email]
+              required: [firstName, lastName, email]
       responses:
         "201":
           content:
@@ -112,20 +112,20 @@ components:
   schemas:
     Client:
       type: object
-      required: [first_name, last_name, email]
+      required: [firstName, lastName, email]
       properties:
         id:
           type: string
-        first_name:
+        firstName:
           type: string
-        last_name:
+        lastName:
           type: string
         email:
           type: string
           format: email
         description:
           type: string
-        social_links:
+        socialLinks:
           type: array
           items:
             type: string
@@ -136,13 +136,13 @@ components:
       properties:
         id:
           type: string
-        client_id:
+        clientId:
           type: string
         title:
           type: string
         content:
           type: string
-        created_at:
+        createdAt:
           type: string
           format: date-time
 
