@@ -1,0 +1,17 @@
+# Multi-word demo synonyms for document content search
+address proof, utility bill
+financial advisor, advisor
+registered investment advisor, RIA
+meeting summary, meeting notes, call summary
+meeting prep, meeting preparation, client brief
+task generation, task creation
+actionable tasks, follow-up tasks, action items
+AI search, intelligent search, unified search
+client-ready emails, client emails
+account opening, new account opening
+workflow automation, process automation
+operational work, admin work, administrative work
+fragmented tools, disconnected systems
+technology stack, tech stack
+client information, client data
+data privacy, privacy controls

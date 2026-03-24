@@ -62,6 +62,7 @@ class SearchingTest(
 
     @Test
     fun `search finds client by email fragment`() {
+        // init
         val client = createClient(
             """
             {
@@ -73,8 +74,10 @@ class SearchingTest(
             """.trimIndent()
         )
 
+        // when
         val response = search(query = "NevisWealth")
 
+        // then
         assertEquals("NevisWealth", response.query)
         assertEquals(1, response.clients.size)
         assertEquals(client.id, response.clients.single().id)
@@ -83,6 +86,7 @@ class SearchingTest(
 
     @Test
     fun `search finds client by description`() {
+        // init
         val client = createClient(
             """
             {
@@ -94,14 +98,17 @@ class SearchingTest(
             """.trimIndent()
         )
 
+        // when
         val response = search(query = "passport")
 
+        // then
         assertEquals(1, response.clients.size)
         assertEquals(client.id, response.clients.single().id)
     }
 
     @Test
     fun `search with document type returns only documents`() {
+        // init
         val client = createClient(
             """
             {
@@ -111,6 +118,7 @@ class SearchingTest(
             }
             """.trimIndent()
         )
+
         val document = createDocument(
             client.id,
             """
@@ -121,15 +129,103 @@ class SearchingTest(
             """.trimIndent()
         )
 
+        // when
         val response = search(query = "utility", type = "document")
 
+        // then
         assertTrue(response.clients.isEmpty())
         assertEquals(1, response.documents.size)
         assertEquals(document.id, response.documents.single().id)
     }
 
     @Test
+    fun `search finds document by configured synonym`() {
+        // init
+        val firstClient = createClient(
+            """
+            {
+              "firstName": "Laura",
+              "lastName": "Bell",
+              "email": "laura@example.com"
+            }
+            """.trimIndent()
+        )
+
+        val synonymMatchedDocument = createDocument(
+            firstClient.id,
+            """
+            {
+              "title": "Residence evidence",
+              "content": "Please attach a recent utility bill."
+            }
+            """.trimIndent()
+        )
+
+        val secondClient = createClient(
+            """
+            {
+              "firstName": "Mark",
+              "lastName": "Stone",
+              "email": "mark@example.com"
+            }
+            """.trimIndent()
+        )
+
+        val exactMatchedDocument = createDocument(
+            secondClient.id,
+            """
+            {
+              "title": "Verification checklist",
+              "content": "Accepted address proof includes government-issued residence confirmation."
+            }
+            """.trimIndent()
+        )
+
+        createDocument(
+            secondClient.id,
+            """
+            {
+              "title": "Identity file",
+              "content": "Passport copy and selfie verification."
+            }
+            """.trimIndent()
+        )
+
+        val thirdClient = createClient(
+            """
+            {
+              "firstName": "Nina",
+              "lastName": "Cole",
+              "email": "nina@example.com"
+            }
+            """.trimIndent()
+        )
+
+        createDocument(
+            thirdClient.id,
+            """
+            {
+              "title": "Income evidence",
+              "content": "Latest bank statement and salary confirmation."
+            }
+            """.trimIndent()
+        )
+
+        // when
+        val response = search(query = "address proof", type = "document")
+
+        // then
+        assertTrue(response.clients.isEmpty())
+        assertEquals(2, response.documents.size)
+        assertEquals(
+            setOf(synonymMatchedDocument.id, exactMatchedDocument.id),
+            response.documents.map { it.id }.toSet()
+        )
+    }
+
+    @Test
     fun `search with client type returns only clients`() {
+        // init
         val client = createClient(
             """
             {
@@ -140,6 +236,7 @@ class SearchingTest(
             }
             """.trimIndent()
         )
+
         createDocument(
             client.id,
             """
@@ -150,8 +247,10 @@ class SearchingTest(
             """.trimIndent()
         )
 
+        // when
         val response = search(query = "passport", type = "client")
 
+        // then
         assertEquals(1, response.clients.size)
         assertEquals(client.id, response.clients.single().id)
         assertTrue(response.documents.isEmpty())
@@ -159,6 +258,7 @@ class SearchingTest(
 
     @Test
     fun `search without type returns both clients and documents`() {
+        // init
         val client = createClient(
             """
             {
@@ -169,6 +269,7 @@ class SearchingTest(
             }
             """.trimIndent()
         )
+
         val document = createDocument(
             client.id,
             """
@@ -179,8 +280,10 @@ class SearchingTest(
             """.trimIndent()
         )
 
+        // when
         val response = search(query = "passport")
 
+        // then
         assertEquals(1, response.clients.size)
         assertEquals(client.id, response.clients.single().id)
         assertEquals(1, response.documents.size)
@@ -189,6 +292,7 @@ class SearchingTest(
 
     @Test
     fun `search returns empty results when nothing matches`() {
+        // init
         createClient(
             """
             {
@@ -199,35 +303,47 @@ class SearchingTest(
             """.trimIndent()
         )
 
+        // when
         val response = search(query = "definitely-not-found")
 
+        // then
         assertTrue(response.clients.isEmpty())
         assertTrue(response.documents.isEmpty())
     }
 
     @Test
     fun `search returns 400 for blank query`() {
+        // init
+        val request = get("/api/v1/search")
+            .param("q", "   ")
+
+        // when
         val mvcResult = mockMvc.perform(
-            get("/api/v1/search")
-                .param("q", "   ")
+            request
         )
             .andExpect(status().isBadRequest)
             .andReturn()
 
+        // then
         val response = objectMapper.readValue(mvcResult.response.contentAsString, ErrorResponse::class.java)
         assertTrue(response.message.contains("q"))
     }
 
     @Test
     fun `search returns 400 for invalid type`() {
+        // init
+        val request = get("/api/v1/search")
+            .param("q", "passport")
+            .param("type", "wrong")
+
+        // when
         val mvcResult = mockMvc.perform(
-            get("/api/v1/search")
-                .param("q", "passport")
-                .param("type", "wrong")
+            request
         )
             .andExpect(status().isBadRequest)
             .andReturn()
 
+        // then
         val response = objectMapper.readValue(mvcResult.response.contentAsString, ErrorResponse::class.java)
         assertTrue(response.message.contains("Invalid search type"))
     }

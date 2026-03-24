@@ -65,6 +65,7 @@ class IndexingTest(
 
     @Test
     fun `create client indexes document and upserts by business key`() {
+        // init
         val firstResponse = createClient(
             """
             {
@@ -77,6 +78,7 @@ class IndexingTest(
             """.trimIndent()
         )
 
+        // when
         val secondResponse = createClient(
             """
             {
@@ -89,6 +91,7 @@ class IndexingTest(
             """.trimIndent()
         )
 
+        // then
         assertEquals(firstResponse.id, secondResponse.id)
 
         val indexedClient = getIndexedClient(firstResponse.id)
@@ -106,6 +109,7 @@ class IndexingTest(
 
     @Test
     fun `create document indexes document for existing client`() {
+        // init
         val clientResponse = createClient(
             """
             {
@@ -116,6 +120,7 @@ class IndexingTest(
             """.trimIndent()
         )
 
+        // when
         val documentResponse = createDocument(
             clientResponse.id,
             """
@@ -126,6 +131,7 @@ class IndexingTest(
             """.trimIndent()
         )
 
+        // then
         val indexedDocument = getIndexedDocument(documentResponse.id)
         assertNotNull(indexedDocument)
         assertEquals(documentResponse.id, indexedDocument["documentId"].stringValue())
@@ -137,9 +143,11 @@ class IndexingTest(
 
     @Test
     fun `create document returns 404 when client does not exist`() {
+        // init
         val missingClientId = UUID.randomUUID().toString()
 
-        mockMvc.perform(
+        // when
+        val resultActions = mockMvc.perform(
             post("/api/v1/clients/{id}/documents", missingClientId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
@@ -151,6 +159,9 @@ class IndexingTest(
                     """.trimIndent()
                 )
         )
+
+        // then
+        resultActions
             .andExpect(status().isNotFound)
     }
 
