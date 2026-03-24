@@ -3,7 +3,7 @@ info:
   title: API
   version: 1.0.0
 paths:
-  /clients:
+  /api/v1/clients:
     post:
       requestBody:
         required: true
@@ -40,7 +40,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-  /clients/{id}/documents:
+  /api/v1/clients/{id}/documents:
     post:
       parameters:
         - name: id
@@ -80,7 +80,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-  /search:
+  /api/v1/search:
     get:
       parameters:
         - name: q

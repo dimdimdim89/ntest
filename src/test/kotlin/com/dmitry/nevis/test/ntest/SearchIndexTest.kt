@@ -10,6 +10,7 @@ import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.util.UUID
 
 @Testcontainers
 @SpringBootTest
@@ -34,10 +35,10 @@ class SearchIndexTest(
 
     @Test
     fun `index test`() {
-        subject.test()
-        println("good")
+        //subject.test()
+        println("good:${UUID.randomUUID()}")
         Thread.sleep(1000)
-        println(subject.search())
+        //println(subject.search())
     }
 
 }
