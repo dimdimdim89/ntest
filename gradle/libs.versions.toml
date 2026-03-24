@@ -9,6 +9,7 @@ opensearch-testcontainers = "4.1.0"
 opensearch-java = { module = "org.opensearch.client:opensearch-java", version.ref = "opensearch" }
 opensearch-testcontainers = { module = "org.opensearch:opensearch-testcontainers", version.ref = "opensearch-testcontainers" }
 spring-boot-starter-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
+spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 jackson-module-kotlin = { module = "tools.jackson.module:jackson-module-kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
 spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }

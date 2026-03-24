@@ -21,6 +21,7 @@ repositories {
 dependencies {
 	implementation(libs.opensearch.java)
 	implementation(libs.spring.boot.starter.webmvc)
+	implementation(libs.spring.boot.starter.validation)
 	implementation(libs.kotlin.reflect)
 	implementation(libs.jackson.module.kotlin)
 	testImplementation(libs.opensearch.testcontainers)

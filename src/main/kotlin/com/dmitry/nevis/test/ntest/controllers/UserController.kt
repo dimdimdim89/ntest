@@ -3,6 +3,7 @@ package com.dmitry.nevis.test.ntest.controllers
 import com.dmitry.nevis.test.ntest.service.ClientIndexRequest
 import com.dmitry.nevis.test.ntest.service.DocumentIndexRequest
 import com.dmitry.nevis.test.ntest.service.IndexService
+import jakarta.validation.Valid
 import java.time.Instant
 import java.util.UUID
 import org.springframework.http.HttpStatus
@@ -21,7 +22,7 @@ class UserController(
 ) {
 
 	@PostMapping("/clients")
-	fun createClient(@RequestBody request: CreateClientRequest): ResponseEntity<Client> {
+	fun createClient(@Valid @RequestBody request: CreateClientRequest): ResponseEntity<Client> {
 		val response = indexService.indexClient(
 			ClientIndexRequest(
 				firstName = request.firstName,
@@ -47,7 +48,7 @@ class UserController(
 	@PostMapping("/clients/{id}/documents")
 	fun createClientDocument(
 		@PathVariable id: String,
-		@RequestBody request: CreateDocumentRequest,
+		@Valid @RequestBody request: CreateDocumentRequest,
 	): ResponseEntity<Document> {
 		val clientId = parseClientId(id)
 		val response = try {

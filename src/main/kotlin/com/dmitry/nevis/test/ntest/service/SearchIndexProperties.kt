@@ -6,4 +6,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 data class SearchIndexProperties(
     val clientIndex: String = "clients",
     val documentIndex: String = "documents",
+    val searchResultSize: Int = 20,
 )
