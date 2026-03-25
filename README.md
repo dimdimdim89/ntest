@@ -102,3 +102,12 @@ Notes:
 - The collection variable `baseUrl` defaults to `http://localhost:8080`.
 - `Create Client` automatically saves the returned `clientId`.
 - `Create Document for Client` uses that saved `clientId`.
+
+## Design Notes
+
+- Tech stack: Kotlin, Spring Boot, OpenSearch.
+- For demo simplicity, OpenSearch is used directly without a separate database.
+- Client identity is modeled as a business key: `firstName + lastName + email`. A deterministic UUID is derived from that key, so repeated client creation requests upsert the same record instead of creating duplicates.
+- Document search uses OpenSearch full-text search. For synonym-like matching, a custom search analyzer with `synonym_graph` is configured together with a small curated synonym list stored in application resources.
+- Search results are intentionally split into clients and documents because they are different entity types with different fields. An optional `type` filter allows narrowing the response to one entity type.
+- Document search results return a summary snippet based on OpenSearch highlighting, with fallback to truncated content.
