@@ -1,0 +1,114 @@
+{
+  "info": {
+    "name": "ntest",
+    "_postman_id": "ecad0abd-2ee8-4cf0-9c2a-c205e16e7250",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "clientId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Create Client",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const response = pm.response.json();",
+              "pm.collectionVariables.set('clientId', response.id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"description\": \"Client onboarding for address verification\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/clients",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "clients"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create Document for Client",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Address Proof\",\n  \"content\": \"Please attach a recent utility bill for address verification.\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/clients/{{clientId}}/documents",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "clients",
+            "{{clientId}}",
+            "documents"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Search Documents",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/search?q=address%20proof&type=document",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "search"
+          ],
+          "query": [
+            {
+              "key": "q",
+              "value": "address proof"
+            },
+            {
+              "key": "type",
+              "value": "document"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
