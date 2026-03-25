@@ -45,11 +45,11 @@ class SearchController(
 				)
 			},
 			documents = response.documents.map { document ->
-				Document(
+				SearchDocument(
 					id = document.documentId,
 					clientId = document.clientId,
 					title = document.title,
-					content = document.content,
+					summary = document.summary,
 					createdAt = document.createdAt,
 				)
 			},

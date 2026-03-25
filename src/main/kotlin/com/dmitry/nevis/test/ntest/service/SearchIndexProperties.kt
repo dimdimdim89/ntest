@@ -7,4 +7,5 @@ data class SearchIndexProperties(
     val clientIndex: String = "clients",
     val documentIndex: String = "documents",
     val searchResultSize: Int = 20,
+    val documentSummarySize: Int = 160,
 )

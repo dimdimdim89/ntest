@@ -8,6 +8,8 @@ import org.opensearch.client.opensearch._types.query_dsl.MatchQuery
 import org.opensearch.client.opensearch._types.query_dsl.MultiMatchQuery
 import org.opensearch.client.opensearch._types.query_dsl.Query
 import org.opensearch.client.opensearch._types.query_dsl.WildcardQuery
+import org.opensearch.client.opensearch.core.search.Hit
+import org.opensearch.client.opensearch.core.search.HighlightField
 import org.opensearch.client.opensearch.core.SearchRequest as OpenSearchSearchRequest
 import org.springframework.stereotype.Service
 import tools.jackson.databind.ObjectMapper
@@ -69,13 +71,22 @@ class SearchService(
                 .index(properties.documentIndex)
                 .size(properties.searchResultSize)
                 .query(documentSearchQuery(query))
+                .highlight { highlight ->
+                    highlight.fields(
+                        "content",
+                        HighlightField.of { field ->
+                            field
+                                .numberOfFragments(1)
+                                .fragmentSize(properties.documentSummarySize)
+                        }
+                    )
+                }
                 .build(),
             JsonData::class.java
         )
 
         return response.hits().hits()
-            .mapNotNull { it.source() }
-            .map { source -> objectMapper.readValue(source.toJson().toString(), SearchDocumentResult::class.java) }
+            .mapNotNull { hit -> searchDocumentResult(hit) }
     }
 
     private fun clientSearchQuery(query: String): Query {
@@ -102,6 +113,26 @@ class SearchService(
             match.field("content")
                 .query(FieldValue.of(query))
         }.toQuery()
+    }
+
+    private fun searchDocumentResult(hit: Hit<JsonData>): SearchDocumentResult? {
+        val source = hit.source() ?: return null
+        val indexedDocument = objectMapper.readValue(source.toJson().toString(), IndexedSearchedDocument::class.java)
+
+        return SearchDocumentResult(
+            documentId = indexedDocument.documentId,
+            clientId = indexedDocument.clientId,
+            title = indexedDocument.title,
+            summary = extractDocumentSummary(hit, indexedDocument),
+            createdAt = indexedDocument.createdAt,
+        )
+    }
+
+    private fun extractDocumentSummary(hit: Hit<JsonData>, document: IndexedSearchedDocument): String {
+        return hit.highlight()["content"]
+            ?.firstOrNull()
+            ?.takeIf { it.isNotBlank() }
+            ?: document.content.take(properties.documentSummarySize)
     }
 }
 
@@ -131,6 +162,14 @@ data class SearchClientResult(
 )
 
 data class SearchDocumentResult(
+    val documentId: String,
+    val clientId: String,
+    val title: String,
+    val summary: String,
+    val createdAt: Instant,
+)
+
+data class IndexedSearchedDocument(
     val documentId: String,
     val clientId: String,
     val title: String,

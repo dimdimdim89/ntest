@@ -44,10 +44,18 @@ data class Document(
 	val createdAt: Instant,
 )
 
+data class SearchDocument(
+	val id: String,
+	val clientId: String,
+	val title: String,
+	val summary: String,
+	val createdAt: Instant,
+)
+
 data class SearchResults(
 	val query: String,
 	val clients: List<Client>,
-	val documents: List<Document>,
+	val documents: List<SearchDocument>,
 )
 
 data class ErrorResponse(

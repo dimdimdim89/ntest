@@ -159,7 +159,23 @@ components:
         documents:
           type: array
           items:
-            $ref: "#/components/schemas/Document"
+            $ref: "#/components/schemas/SearchDocument"
+
+    SearchDocument:
+      type: object
+      required: [title, summary]
+      properties:
+        id:
+          type: string
+        clientId:
+          type: string
+        title:
+          type: string
+        summary:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
 
     ErrorResponse:
       type: object

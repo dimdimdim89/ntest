@@ -224,6 +224,42 @@ class SearchingTest(
     }
 
     @Test
+    fun `search document summary prefers highlight over raw truncation`() {
+        // init
+        val client = createClient(
+            """
+            {
+              "firstName": "Helen",
+              "lastName": "Ward",
+              "email": "helen@example.com"
+            }
+            """.trimIndent()
+        )
+
+        val longPrefix = "A".repeat(properties.documentSummarySize + 40)
+        val content = "$longPrefix utility bill for the current address was provided during onboarding."
+        createDocument(
+            client.id,
+            """
+            {
+              "title": "Address verification",
+              "content": "$content"
+            }
+            """.trimIndent()
+        )
+
+        // when
+        val response = search(query = "utility", type = "document")
+
+        // then
+        assertEquals(1, response.documents.size)
+        val summary = response.documents.single().summary
+        println(summary)
+        assertTrue(summary.contains("<em>utility</em>", ignoreCase = true))
+        assertTrue(summary.length < content.length)
+    }
+
+    @Test
     fun `search with client type returns only clients`() {
         // init
         val client = createClient(
