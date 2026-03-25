@@ -4,6 +4,7 @@ import org.opensearch.client.opensearch.OpenSearchClient
 import org.opensearch.client.opensearch._types.Refresh
 import org.opensearch.client.opensearch.core.ExistsRequest
 import org.opensearch.client.opensearch.core.IndexRequest
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.nio.charset.StandardCharsets
 import java.time.Instant
@@ -14,6 +15,8 @@ class IndexService(
     private val client: OpenSearchClient,
     private val properties: SearchIndexProperties,
 ) {
+    private val log = LoggerFactory.getLogger(IndexService::class.java)
+
     fun indexClient(clientIndexRequest: ClientIndexRequest): ClientIndexResponse {
         val clientId = clientIdFor(clientIndexRequest)
 
@@ -35,6 +38,7 @@ class IndexService(
             }
         )
 
+        log.info("Indexed client '{}' into '{}'", clientId, properties.clientIndex)
         return ClientIndexResponse(clientId)
     }
 
@@ -60,6 +64,12 @@ class IndexService(
             }
         )
 
+        log.info(
+            "Indexed document '{}' for client '{}' into '{}'",
+            documentId,
+            documentIndexRequest.clientId,
+            properties.documentIndex
+        )
         return DocumentIndexResponse(
             documentId = documentId,
             clientId = documentIndexRequest.clientId,

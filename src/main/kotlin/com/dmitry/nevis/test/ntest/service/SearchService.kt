@@ -11,6 +11,7 @@ import org.opensearch.client.opensearch._types.query_dsl.WildcardQuery
 import org.opensearch.client.opensearch.core.search.Hit
 import org.opensearch.client.opensearch.core.search.HighlightField
 import org.opensearch.client.opensearch.core.SearchRequest as OpenSearchSearchRequest
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import tools.jackson.databind.ObjectMapper
 import java.time.Instant
@@ -21,6 +22,8 @@ class SearchService(
     private val properties: SearchIndexProperties,
     private val objectMapper: ObjectMapper,
 ) {
+    private val log = LoggerFactory.getLogger(SearchService::class.java)
+
     fun search(request: SearchRequest): SearchResponse {
         val normalizedQuery = request.query.trim()
         if (normalizedQuery.isEmpty()) {
@@ -42,6 +45,14 @@ class SearchService(
         } else {
             searchDocuments(normalizedQuery)
         }
+
+        log.info(
+            "Executed search for query='{}', type='{}', clientHits={}, documentHits={}",
+            normalizedQuery,
+            request.type?.name ?: "ALL",
+            clients.size,
+            documents.size
+        )
 
         return SearchResponse(
             query = normalizedQuery,

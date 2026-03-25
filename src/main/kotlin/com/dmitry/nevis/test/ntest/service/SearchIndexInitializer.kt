@@ -6,6 +6,7 @@ import org.opensearch.client.opensearch._types.analysis.CustomAnalyzer
 import org.opensearch.client.opensearch._types.mapping.Property
 import org.opensearch.client.opensearch.indices.IndexSettings
 import org.opensearch.client.opensearch.indices.IndexSettingsAnalysis
+import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.stereotype.Component
@@ -16,6 +17,8 @@ class SearchIndexInitializer(
     private val properties: SearchIndexProperties,
     private val documentSynonymsLoader: DocumentSynonymsLoader,
 ) : ApplicationRunner {
+
+    private val log = LoggerFactory.getLogger(SearchIndexInitializer::class.java)
 
     override fun run(args: ApplicationArguments) {
         createIndexes()
@@ -28,9 +31,11 @@ class SearchIndexInitializer(
 
     private fun createClientIndexIfMissing() {
         if (client.indices().exists { it.index(properties.clientIndex) }.value()) {
+            log.info("Skipping client index creation, index '{}' already exists", properties.clientIndex)
             return
         }
 
+        log.info("Creating client index '{}'", properties.clientIndex)
         client.indices().create { request ->
             request.index(properties.clientIndex)
                 .mappings { mappings ->
@@ -55,11 +60,17 @@ class SearchIndexInitializer(
 
     private fun createDocumentIndexIfMissing() {
         if (client.indices().exists { it.index(properties.documentIndex) }.value()) {
+            log.info("Skipping document index creation, index '{}' already exists", properties.documentIndex)
             return
         }
 
         val documentSynonyms = documentSynonymsLoader.load()
 
+        log.info(
+            "Creating document index '{}' with {} configured synonym rules",
+            properties.documentIndex,
+            documentSynonyms.size
+        )
         client.indices().create { request ->
             request.index(properties.documentIndex)
                 .settings(documentIndexSettings(documentSynonyms))
